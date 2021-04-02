@@ -59,7 +59,6 @@ class UserNamespaceQuery extends ObjectType
 
     public function resolveGetJWT($rootValue, $args, $context, ResolveInfo $info)
     {
-
         // Identifying...
         $accounts = UserAccountRepository::getInstance()->fetchAll();
         $matchingAccounts = array_filter($accounts, function ($item) use ($args) {
@@ -80,6 +79,5 @@ class UserNamespaceQuery extends ObjectType
 
         return null;
     }
-
 
 }
