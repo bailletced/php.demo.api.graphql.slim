@@ -4,6 +4,8 @@ namespace App\GraphQL\Schema\demo\User;
 
 use App\Boilerplate\AppContext;
 use App\Boilerplate\GraphQL\Type\Definition\ObjectType;
+use App\GraphQL\Schema\demo\Directives\LowerCaseDirective;
+use App\GraphQL\Schema\demo\Directives\UpperCaseDirective;
 use App\GraphQL\Schema\demo\TypeRegistry;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -22,7 +24,7 @@ class UserAccount extends ObjectType
             'fields' => function () use ($types) {
                 return [
                     'id' => [
-                        'type' => $types::id(),
+                        'type' => $types::nonNull($types::id()),
                         'description' => 'User\'s unique identifier',
                     ],
                     'login' => [
@@ -35,6 +37,7 @@ class UserAccount extends ObjectType
                     ],
                     'firstName' => [
                         'type' => $types::string(),
+                        'schemaDirectives' => [UpperCaseDirective::class],
                     ],
                     'lastName' => [
                         'type' => $types::string(),

@@ -54,7 +54,10 @@ class UserNamespaceQuery extends ObjectType
 
     public function resolveMe($rootValue, $args, AppContext $context, ResolveInfo $info)
     {
-        return $context->getAuthenticatedUserAccount();
+        return [
+            "firstName" => "toto",
+        ];
+//        return $context->getAuthenticatedUserAccount();
     }
 
     public function resolveGetJWT($rootValue, $args, $context, ResolveInfo $info)
