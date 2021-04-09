@@ -4,6 +4,12 @@ namespace App\Boilerplate\GraphQL;
 
 use App\Boilerplate\AppContext;
 use App\GraphQL\Schema\_common\Data\UserAccount\Repository\UserAccountRepository;
+use App\GraphQL\Schema\demo\Directives\UpperCaseDirective;
+use GraphQL\Language\Parser;
+use GraphQL\Language\Source;
+use GraphQL\Language\Visitor;
+use GraphQL\Utils\AST;
+use GraphQL\Utils\BuildSchema;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -162,7 +168,7 @@ class Endpoint
      * @throws Exception\FileNotFoundException
      * @TODO fix return type to load Schema
      */
-    protected function getSchema ($lookupSchemaOptions)
+    protected function getSchema ($lookupSchemaOptions) :Schema
     {
         $schemaLoader = null;
 
@@ -216,14 +222,83 @@ class Endpoint
             $contextValue->setRequest($this->request);
             $this->hydrateContextWithAuthenticatedUser();
 
+            $schema = <<<EOD
+                directive @upper on FIELD_DEFINITION | FIELD
+                directive @lower on FIELD_DEFINITION | FIELD
+
+                schema {
+                  query: Query
+                }
+                
+                type Query {
+                  deprecatedField: String @deprecated(reason : "This field is deprecated!")
+                  fieldWithException: String
+                  hello: String @upper
+                  "Interact with the APIs for user related purposes"
+                  user: UserNamespaceQuery
+                }
+                
+                "Interact with the APIs for user related purposes"
+                type UserNamespaceQuery {
+                  "Request a valid JWT token using the user's credentials"
+                  getJWT (
+                    #User password (plain text)
+                    password: String,
+                    #User login handle
+                    username: String
+                  ): String
+                  name: String
+                  id: String 
+                }
+            EOD;
 
 
+            $documentNode = Parser::parse(new Source($schema ?? '', 'GraphQL'));
+//            $schemaDirectiveVisitor = SchemaDirectiveVisitor::getInstance();
+//            $schemaDirectiveVisitor->setSchema($documentNode);
+//            $schemaDirectiveVisitor->visitFieldDefinition("getJWT");
+
+            $rootValue = include __DIR__ . '/rootvalue.php';
+
+            $schema = BuildSchema::build($schema, function($typeConfig) {
+                return ResolverController::TypeConfigDecorator($typeConfig);
+            });
+
+            $schema->getTypeMap();
+
+            $directives = [
+                new UpperCaseDirective
+            ];
+
+
+
+            DirectiveResolver::bind($schema, function($name) {
+                if($name) {
+//                    var_dump(DirectiveResolver::getInstance()::$directives[$name]);
+                    return DirectiveResolver::getInstance()::$directives[$name];
+                }
+            });
+
+
+//            $schema = $this->getSchema($lookupSchemaOptions);
+//            var_dump($schema->getASTNode());
+//            exit;
+//            var_dump(
+//                AST::astFromValue(null, $schema->)
+//            );
+//            $schema->
+//                getQueryType()->getFields()["user"]->getType()->config['fields']['getJWT']['resolve'][1] = "test";
+
+//            $source = gettype($persistedQuery) === 'string' ? $persistedQuery : $data['query'];
+//            $documentNode = Parser::parse(new Source($source ?? '', 'GraphQL'));
+//            var_dump($documentNode);
+//            exit;
             // $debug = DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE;
 
             $httpCode = 200;
             $output = GraphQL
                 ::executeQuery(
-                    $this->getSchema($lookupSchemaOptions),
+                    $schema,
                     gettype($persistedQuery) === 'string' ? $persistedQuery : $data['query'],
                     $rootValue,
                     $contextValue,
@@ -241,6 +316,7 @@ class Endpoint
                 })
                 ->toArray(self::$debugFlag)
             ;
+
         }
         catch (GenericGraphQlException $ex) {
             $httpCode = $ex->isHttpCode ? $ex->getCode() : 500;

@@ -17,7 +17,8 @@
         "ext-json": "^1.7",
         "ext-redis": "^5.3",
         "overblog/dataloader-php": "^0.5.3",
-        "web-token/jwt-easy": "^2.2"
+        "web-token/jwt-easy": "^2.2",
+        "guzzlehttp/promises": "^1.4"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.17"
