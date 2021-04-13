@@ -54,8 +54,11 @@ class UserNamespaceQuery extends ObjectType
 
     public function resolveMe($rootValue, $args, AppContext $context, ResolveInfo $info)
     {
+        $nowUTC = new \DateTime('now', new \DateTimeZone('UTC'));
+        $nowUTC->setTimezone(new \DateTimeZone('Europe/Paris'));
         return [
             "firstName" => "toto",
+            "creationDate" => $nowUTC,
         ];
 //        return $context->getAuthenticatedUserAccount();
     }

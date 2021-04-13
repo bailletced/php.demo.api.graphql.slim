@@ -8,18 +8,19 @@ use App\Boilerplate\GraphQL\SchemaTypeDirectiveInterface;
 use App\Boilerplate\GraphQL\SchemaTypeMapDirectiveVisitor;
 use GraphQL\Language\DirectiveLocation;
 use GraphQL\Type\Definition\Directive;
+use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\FieldDefinition;
+use GraphQL\Type\Definition\Type;
 
-class LowerCaseDirective extends SchemaTypeMapDirectiveVisitor implements SchemaTypeDirectiveInterface
+class DateFormatDirective extends SchemaTypeMapDirectiveVisitor implements SchemaTypeDirectiveInterface
 {
-
     /**
      * @return Directive
      */
     public static function getDirective(): Directive
     {
         return new Directive([
-            'name' => 'lower',
+            'name' => 'format',
             'description' => 'Set text to lower case',
             'locations' => [
                 DirectiveLocation::FIELD_DEFINITION,
@@ -34,7 +35,7 @@ class LowerCaseDirective extends SchemaTypeMapDirectiveVisitor implements Schema
     public static function onVisitCallback(callable $resolveFn) :callable {
         return function($value, $args, $context, $info) use ($resolveFn) {
             $resolverFnResult = $resolveFn($value, $args, $context, $info);
-            return strtolower($resolverFnResult);
+            return $resolverFnResult->format($args['format']);
         };
     }
 
@@ -43,7 +44,12 @@ class LowerCaseDirective extends SchemaTypeMapDirectiveVisitor implements Schema
      */
     public static function addArgumentDynamically(FieldDefinition $field)
     {
-        // TODO: Implement addArgumentDynamically() method.
+        $field->args[] = new FieldArgument([
+            "name" => "format",
+            "type" => Type::string(),
+            "defaultValue" => "d/m/Y",
+            "description" => "Convert the field to specified date format",
+        ]);
     }
 
 }

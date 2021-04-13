@@ -4,6 +4,7 @@ namespace App\GraphQL\Schema\demo\User;
 
 use App\Boilerplate\AppContext;
 use App\Boilerplate\GraphQL\Type\Definition\ObjectType;
+use App\GraphQL\Schema\demo\Directives\DateFormatDirective;
 use App\GraphQL\Schema\demo\Directives\LowerCaseDirective;
 use App\GraphQL\Schema\demo\Directives\UpperCaseDirective;
 use App\GraphQL\Schema\demo\TypeRegistry;
@@ -41,6 +42,10 @@ class UserAccount extends ObjectType
                     ],
                     'lastName' => [
                         'type' => $types::string(),
+                    ],
+                    'creationDate' => [
+                        'type' => $types->string(),
+                        'schemaDirectives' => [DateFormatDirective::class],
                     ],
                     '_isMe' => [
                         'type' => $types::boolean(),

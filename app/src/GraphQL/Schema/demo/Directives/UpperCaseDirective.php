@@ -4,11 +4,27 @@
 namespace App\GraphQL\Schema\demo\Directives;
 
 
+use App\Boilerplate\GraphQL\SchemaTypeDirectiveInterface;
 use App\Boilerplate\GraphQL\SchemaTypeMapDirectiveVisitor;
+use GraphQL\Language\DirectiveLocation;
+use GraphQL\Type\Definition\Directive;
+use GraphQL\Type\Definition\FieldDefinition;
 
-class UpperCaseDirective extends SchemaTypeMapDirectiveVisitor
+class UpperCaseDirective extends SchemaTypeMapDirectiveVisitor implements SchemaTypeDirectiveInterface
 {
-    public static $name = "upper";
+    /**
+     * @return Directive
+     */
+    public static function getDirective(): Directive
+    {
+        return new Directive([
+            'name' => 'upper',
+            'description' => 'Set text to upper case',
+            'locations' => [
+                DirectiveLocation::FIELD_DEFINITION,
+            ],
+        ]);
+    }
 
     /**
      * @param callable $resolveFn
@@ -19,5 +35,13 @@ class UpperCaseDirective extends SchemaTypeMapDirectiveVisitor
             $resolverFnResult = $resolveFn($value, $args, $context, $info);
             return strtoupper($resolverFnResult);
         };
+    }
+
+    /**
+     * @param FieldDefinition $field
+     */
+    public static function addArgumentDynamically(FieldDefinition $field)
+    {
+        // TODO: Implement addArgumentDynamically() method.
     }
 }

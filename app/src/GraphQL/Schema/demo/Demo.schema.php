@@ -19,24 +19,23 @@ return (function () {
         ->setTypeLoader(function($name) {
             $typeRegistry = TypeRegistry::getInstance();
             return $typeRegistry->byTypeName($name);
-        })
-        ->setDirectives([new Directive([
-            'name' => 'track',
-            'description' => 'Instruction to record usage of the field by client',
-            'locations' => [
-                DirectiveLocation::FIELD_DEFINITION,
-            ],
-            'args' => [
-                new FieldArgument([
-                    'name' => 'details',
-                    'type' => Type::string(),
-                    'description' => 'String with additional details of field usage scenario',
-                    'defaultValue' => ''
-                ])
-            ]
-        ])]
-        )
-    ;
+        });
+//        ->setDirectives([new Directive([
+//                'name' => 'track',
+//                'description' => 'Instruction to record usage of the field by client',
+//                'locations' => [
+//                    DirectiveLocation::FIELD,
+//                ],
+//                'args' => [
+//                    new FieldArgument([
+//                        'name' => 'details',
+//                        'type' => Type::string(),
+//                        'description' => 'String with additional details of field usage scenario',
+//                        'defaultValue' => ''
+//                    ])
+//                ]
+//        ])]
+//        );
 
     return new Schema($config);
 })();

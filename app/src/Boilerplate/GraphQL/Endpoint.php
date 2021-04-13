@@ -229,6 +229,9 @@ class Endpoint
 
             SchemaTypeMapDirectiveVisitor::visit($schema);
 
+//            var_dump($schema);
+//            exit;
+
             $httpCode = 200;
             $output = GraphQL
                 ::executeQuery(
