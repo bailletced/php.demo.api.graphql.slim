@@ -6,6 +6,7 @@ use App\Boilerplate\AppContext;
 use App\Boilerplate\GraphQL\Type\Definition\ObjectType;
 use App\GraphQL\Schema\demo\Directives\DateFormatDirective;
 use App\GraphQL\Schema\demo\Directives\LowerCaseDirective;
+use App\GraphQL\Schema\demo\Directives\AuthDirective;
 use App\GraphQL\Schema\demo\Directives\UpperCaseDirective;
 use App\GraphQL\Schema\demo\TypeRegistry;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -21,6 +22,14 @@ class UserAccount extends ObjectType
             'description' => 'Our blog authors',
             'interfaces' => [
                 $types->DataNodeInterface(),
+            ],
+            'schemaDirectives' => [
+                [
+                    "directive" => AuthDirective::class,
+                    "params" => [
+                        "access" => "ADMIN"
+                    ],
+                ]
             ],
             'fields' => function () use ($types) {
                 return [
@@ -38,14 +47,30 @@ class UserAccount extends ObjectType
                     ],
                     'firstName' => [
                         'type' => $types::string(),
-                        'schemaDirectives' => [UpperCaseDirective::class],
+                        'schemaDirectives' => [
+                            [
+                                "directive" => UpperCaseDirective::class,
+                                "params" => [],
+                            ],
+                        ],
                     ],
                     'lastName' => [
                         'type' => $types::string(),
                     ],
                     'creationDate' => [
                         'type' => $types->string(),
-                        'schemaDirectives' => [DateFormatDirective::class],
+                        'schemaDirectives' => [
+                            [
+                                "directive" => AuthDirective::class,
+                                "params" => [
+                                    "access" => "ADMIN",
+                                ],
+                            ],
+                            [
+                                "directive" => DateFormatDirective::class,
+                                "params" => [],
+                            ],
+                        ]
                     ],
                     '_isMe' => [
                         'type' => $types::boolean(),

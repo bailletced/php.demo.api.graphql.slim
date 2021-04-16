@@ -10,19 +10,18 @@ use GraphQL\Language\DirectiveLocation;
 use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\FieldDefinition;
 
-class LowerCaseDirective extends SchemaTypeMapDirectiveVisitor implements SchemaTypeDirectiveInterface
+class AuthDirective  extends SchemaTypeMapDirectiveVisitor implements SchemaTypeDirectiveInterface
 {
-
     /**
      * @return Directive
      */
     public static function getDirective(): Directive
     {
         return new Directive([
-            'name' => 'lower',
-            'description' => 'Set text to lower case',
+            'name' => 'auth',
+            'description' => 'Check user permission',
             'locations' => [
-                DirectiveLocation::FIELD_DEFINITION,
+                DirectiveLocation::FIELD_DEFINITION
             ],
         ]);
     }
@@ -33,9 +32,13 @@ class LowerCaseDirective extends SchemaTypeMapDirectiveVisitor implements Schema
      * @return callable
      */
     public static function onVisitCallback(callable $resolveFn, array $params) :callable {
-        return function($value, $args, $context, $info) use ($resolveFn) {
-            $resolverFnResult = $resolveFn($value, $args, $context, $info);
-            return strtolower($resolverFnResult);
+        return function($value, $args, $context, $info) use ($resolveFn, $params) {
+            if (isset($params["access"]) && $params["access"] === $value["profile"]) {
+                return $value[$info->fieldName];
+            }
+            else {
+                return null;
+            }
         };
     }
 
@@ -46,5 +49,4 @@ class LowerCaseDirective extends SchemaTypeMapDirectiveVisitor implements Schema
     {
         // TODO: Implement addArgumentDynamically() method.
     }
-
 }

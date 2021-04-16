@@ -30,12 +30,15 @@ class DateFormatDirective extends SchemaTypeMapDirectiveVisitor implements Schem
 
     /**
      * @param callable $resolveFn
+     * @param array $params
      * @return callable
      */
-    public static function onVisitCallback(callable $resolveFn) :callable {
+    public static function onVisitCallback(callable $resolveFn, array $params) :callable {
         return function($value, $args, $context, $info) use ($resolveFn) {
             $resolverFnResult = $resolveFn($value, $args, $context, $info);
-            return $resolverFnResult->format($args['format']);
+            if ($resolverFnResult) {
+                return $resolverFnResult->format($args['format']);
+            }
         };
     }
 

@@ -28,12 +28,13 @@ class UpperCaseDirective extends SchemaTypeMapDirectiveVisitor implements Schema
 
     /**
      * @param callable $resolveFn
+     * @param array $params
      * @return callable
      */
-    public static function onVisitCallback(callable $resolveFn) :callable {
+    public static function onVisitCallback(callable $resolveFn, array $params) :callable {
         return function($value, $args, $context, $info) use ($resolveFn) {
             $resolverFnResult = $resolveFn($value, $args, $context, $info);
-            return strtoupper($resolverFnResult);
+            return is_string($resolverFnResult) ? strtoupper($resolverFnResult) : null;
         };
     }
 

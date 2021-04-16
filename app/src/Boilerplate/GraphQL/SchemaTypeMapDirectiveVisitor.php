@@ -16,7 +16,7 @@ class SchemaTypeMapDirectiveVisitor
     private static $instance;
 
     /** @var array */
-    private static $directives;
+    public $directives;
 
     /**
      * Singleton
@@ -45,9 +45,10 @@ class SchemaTypeMapDirectiveVisitor
             if (!$type instanceof \GraphQL\Type\Definition\ObjectType) {
                 continue;
             }
-
             if (isset($type->config['schemaDirectives'])) {
-                //TODO : replace resolveFN for type
+                if (!isset($type->resolveFieldFn)) {
+                    static::overrideResolver($type);
+                }
             }
 
             foreach ($type->getFields() as $field) {
@@ -64,14 +65,27 @@ class SchemaTypeMapDirectiveVisitor
 
                 //We are here overriding the field resolver
                 if (isset($field->config['schemaDirectives'])) {
-                    foreach ($field->config['schemaDirectives'] as $fieldDirective) {
-                        SchemaTypeMapDirectiveVisitor::getInstance()::$directives[] = $fieldDirective::getDirective();
-                        $fieldDirective::addArgumentDynamically($field);
-                        $field->resolveFn = $fieldDirective::onVisitCallback($field->resolveFn);
-                    }
+                    static::overrideResolver($field);
                 }
             }
         }
     }
 
+    /**
+     * @param $kind
+     */
+    private static function overrideResolver($kind) {
+        foreach ($kind->config['schemaDirectives'] as $directiveArray) {
+            $directive = $directiveArray["directive"];
+            $directiveParams = $directiveArray["params"];
+            SchemaTypeMapDirectiveVisitor::getInstance()->directives[] = $directive::getDirective();
+            if ($kind instanceof FieldDefinition) {
+                $directive::addArgumentDynamically($kind);
+                $kind->resolveFn = $directive::onVisitCallback($kind->resolveFn, $directiveParams);
+            }
+            else if ($kind instanceof Type) {
+                $kind->resolveFieldFn = $directive::onVisitCallback(function() {}, $directiveParams);
+            }
+        }
+    }
 }

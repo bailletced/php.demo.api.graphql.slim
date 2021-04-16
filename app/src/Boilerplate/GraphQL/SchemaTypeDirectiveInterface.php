@@ -9,11 +9,13 @@ use GraphQL\Type\Definition\FieldDefinition;
 
 interface SchemaTypeDirectiveInterface
 {
+
     /**
      * @param callable $resolveFn
+     * @param array $params
      * @return mixed
      */
-    public static function onVisitCallback(callable $resolveFn);
+    public static function onVisitCallback(callable $resolveFn, array $params);
 
     /**
      * @return Directive
@@ -21,6 +23,10 @@ interface SchemaTypeDirectiveInterface
     public static function getDirective(): Directive;
 
 
+    /**
+     * @param FieldDefinition $field
+     * @return mixed
+     */
     public static function addArgumentDynamically(FieldDefinition $field);
 
 }

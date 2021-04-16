@@ -8,6 +8,7 @@ use GraphQL\Language\DirectiveLocation;
 use GraphQL\Type\Definition\FieldArgument;
 use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\Type;
+use App\Boilerplate\GraphQL\SchemaTypeMapDirectiveVisitor;
 
 return (function () {
     /*
@@ -19,7 +20,19 @@ return (function () {
         ->setTypeLoader(function($name) {
             $typeRegistry = TypeRegistry::getInstance();
             return $typeRegistry->byTypeName($name);
-        });
+        })
+        ->setDirectives(
+            array_merge(
+                Directive::getInternalDirectives(),
+                [
+                    \App\GraphQL\Schema\demo\Directives\AuthDirective::getDirective(),
+                    \App\GraphQL\Schema\demo\Directives\UpperCaseDirective::getDirective(),
+                    \App\GraphQL\Schema\demo\Directives\LowerCaseDirective::getDirective(),
+                ]
+            )
+        );
+
+
 //        ->setDirectives([new Directive([
 //                'name' => 'track',
 //                'description' => 'Instruction to record usage of the field by client',

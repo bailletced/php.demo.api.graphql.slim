@@ -57,8 +57,12 @@ class UserNamespaceQuery extends ObjectType
         $nowUTC = new \DateTime('now', new \DateTimeZone('UTC'));
         $nowUTC->setTimezone(new \DateTimeZone('Europe/Paris'));
         return [
-            "firstName" => "toto",
+            "id" => "d2056872-c809-4258-ba40-b32bbfd78e96",
+            "firstName" => "Cedric",
+            "lastName" => "Baillet",
+            "login" => "bailletced",
             "creationDate" => $nowUTC,
+            "profile" => "ADMIN"
         ];
 //        return $context->getAuthenticatedUserAccount();
     }
